@@ -1156,7 +1156,7 @@ episodeList += `
 {
   "title": "${episode.name}",
   "image": "https://media.themoviedb.org/t/p/w500_and_h282_face/${episode.still_path}",
-  "video_url": "http://archive.org/download/vcautopistadoscreadacdo-199661007-996b-43d-5-beae-55e-7c-7b-53648-csze/1%20x%20(1)vctaskareelareddelcontrabandolatcreadacdo-199661007-996b-43d-5-beae-55e-7c-7b-53648-csze.mpv",
+  "video_url": "",
   "duration": "(${episode.runtime})min",
   "number": ${episode.episode_number},
   "rating": ${episode.vote_average}
@@ -1893,6 +1893,7 @@ body, html {
   var link4 = document.getElementById("link4").value;
 
 generar();
+
 
 
 
