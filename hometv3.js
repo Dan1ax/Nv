@@ -38,7 +38,15 @@ function goToPreviousEpisode() {
     if (currentEpisodeIndex > 0) {
         currentEpisodeIndex--;
         const prevEpisode = currentSeason.episodes[currentEpisodeIndex];
-        const episodeItems = document.querySelectorAll('.episode-item');
+        
+        // Obtener el elemento correcto según la temporada actual
+        let episodeItems;
+        if (currentSeasonIndex === 0) {
+            episodeItems = document.querySelectorAll('#episode-list-season1 .episode-item');
+        } else {
+            episodeItems = document.querySelectorAll('#episode-list-season2 .episode-item');
+        }
+        
         const prevEpisodeItem = episodeItems[currentEpisodeIndex];
         const prevProgressBar = prevEpisodeItem.querySelector('.progress-bar');
         const durationStr = prevEpisode.duration.replace('m', '');
@@ -54,7 +62,15 @@ function goToNextEpisode() {
     if (currentEpisodeIndex < currentSeason.episodes.length - 1) {
         currentEpisodeIndex++;
         const nextEpisode = currentSeason.episodes[currentEpisodeIndex];
-        const episodeItems = document.querySelectorAll('.episode-item');
+        
+        // Obtener el elemento correcto según la temporada actual
+        let episodeItems;
+        if (currentSeasonIndex === 0) {
+            episodeItems = document.querySelectorAll('#episode-list-season1 .episode-item');
+        } else {
+            episodeItems = document.querySelectorAll('#episode-list-season2 .episode-item');
+        }
+        
         const nextEpisodeItem = episodeItems[currentEpisodeIndex];
         const nextProgressBar = nextEpisodeItem.querySelector('.progress-bar');
         const durationStr = nextEpisode.duration.replace('m', '');
@@ -134,7 +150,7 @@ function updateTitle(episode) {
 
     const titleDiv = document.createElement('div');
     titleDiv.classList.add('vjs-title');
-    titleDiv.textContent = episode.title;
+    titleDiv.textContent = `Temporada ${currentSeasonIndex + 1} - ${episode.title}`;
     player.el().appendChild(titleDiv);
     currentTitleElement = titleDiv;
     
@@ -216,9 +232,9 @@ function playEpisode(episode, episodeItem, progressBar, durationInSeconds, episo
     });
 }
 
-// Función para renderizar episodios
-function renderEpisodes(season) {
-    episodeList.innerHTML = '';
+// Función para renderizar episodios de una temporada específica
+function renderEpisodes(season, container, seasonIndex) {
+    container.innerHTML = '';
 
     const watchedEpisodes = JSON.parse(localStorage.getItem('watchedEpisodes')) || {};
 
@@ -264,14 +280,16 @@ function renderEpisodes(season) {
 
         playBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            currentSeasonIndex = seasonIndex;
             playEpisode(episode, episodeItem, progressBar, durationInSeconds, index);
         });
 
         episodeItem.addEventListener('click', () => {
+            currentSeasonIndex = seasonIndex;
             playEpisode(episode, episodeItem, progressBar, durationInSeconds, index);
         });
 
-        episodeList.appendChild(episodeItem);
+        container.appendChild(episodeItem);
     });
 }
 
@@ -541,8 +559,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }, 1000);
 
-    // Renderizar episodios
-    renderEpisodes(playlist.seasons[0]);
+    // Renderizar episodios de ambas temporadas
+    renderEpisodes(playlist.seasons[0], episodeListSeason1, 0);
+    renderEpisodes(playlist.seasons[1], episodeListSeason2, 1);
     
     // Configurar controles personalizados
     setupCustomControls();
@@ -562,4 +581,11 @@ seasonSelector.addEventListener('change', function() {
         list.classList.remove('active');
     });
     document.getElementById(selectedSeason).classList.add('active');
+    
+    // Actualizar el índice de temporada actual cuando el usuario cambia manualmente
+    if (selectedSeason === 'season1') {
+        currentSeasonIndex = 0;
+    } else if (selectedSeason === 'season2') {
+        currentSeasonIndex = 1;
+    }
 });
